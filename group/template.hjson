@@ -1,0 +1,106 @@
+{
+	templateId: group
+	templateRole: article
+	model: stream
+	containedBy: ["top", "folder"]
+	label: Group
+	description: Folders can contain all other streams
+	icon: users
+	childSortType: label
+	childSortOrder: ASC
+	schema: {
+		type: object
+		properties: {
+			token: {type:"string"}
+			label: {type:"string"}
+			summary: {type:"string"}
+		}
+	}
+	states: {
+		default: {
+			label: Default
+			description: Folders only have one state
+		}
+	}
+	roles: {
+		editor: {
+			label: Editor
+			description: Editors can manage all content in this folder
+		}
+		viewer: {
+			label: Viewer
+			description: Viewers can access folder contents, but can not add new items
+		}
+	}
+	actor: {
+		social-role: Application
+		rss: true
+		boost-inbox: true
+		boost-followers-only: false
+		boost-children: false
+		publish-followers: true
+	}
+	actions: {
+		create: {
+			roles:["editor","owner"]
+			steps:[
+				{
+					do:"set-data", 
+					values:{
+						label:"New Group"
+					}
+				}
+				{do:"save"}
+				{do:"forward-to", url:"/{{.StreamID}}"}
+			]
+		}
+		view: {
+			roles: ["viewer","editor","owner"]
+			do:"view-html"
+		}
+		edit: {
+			roles: ["editor"]
+			steps:[
+				{
+					do:"as-modal"
+					background:"view"
+					steps: [
+						{
+							do:"edit"
+							form: {
+								type:"layout-vertical"
+								label:"Edit Group"
+								children: [
+									{type:"text", label:"URL Token", path:"token"}
+									{type:"text", label:"Label", path:"label"}
+									{type:"textarea", label:"Summary", path:"summary"}
+								]
+							}
+						}, 
+						{do:"save", comment:"Updated Folder"}
+					]
+				}
+				{do:"refresh-page"}
+			]
+		}
+		delete: {
+			roles: ["editor"]
+			steps: [
+				{do:"delete", title:"Delete this Folder?", message:"This will permanently delete this folder and all of its contents"}
+				{do:"forward-to", url:"/{{.ParentID}}"}
+			]
+		}
+
+		sharing: {
+			roles: ["editor"]
+			steps: [
+				{do:"as-modal", steps: [
+					{do:"set-simple-sharing", roles: ["viewer"], title:"Sharing Settings", message:"Select Which People Can See This Folder"}
+					{do:"save", message:"Sharing updated by {{.Author}}"}
+				]}
+			]
+		}
+		feed: {roles: ["viewer"], do:"view-feed"}
+		websub: {roles: ["viewer"], do:"websub"}
+	}
+}

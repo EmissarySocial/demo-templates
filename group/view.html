@@ -1,0 +1,7 @@
+<div class="page" hx-get="/{{.StreamID}}" hx-trigger="refreshPage from:window" hx-push-url="false">
+	<link rel="alternate" type="application/activity+json" href="{{.Permalink}}">
+	<button class="float-right" hx-get="/{{.StreamID}}/edit">Edit</button>
+	<h1 class="margin-top-none">{{.Label}}</h1>
+	<div class="margin-bottom">{{.Summary}}</div>
+	<div>Follow <b>@{{.Token}}@{{.Hostname}}</b> to join this group and receive messages.</div>
+</div>
