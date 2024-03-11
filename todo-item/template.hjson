@@ -36,7 +36,7 @@
 				]}
 			]
 		}
-		view: {do: "do", "action": "edit"}
+		view: {do: "include", "action": "edit"}
 		edit: {
 			steps: [
 				{do: "as-modal", "steps": [
