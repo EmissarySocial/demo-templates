@@ -2,7 +2,7 @@
 	templateId: "test-todo-item"
 	templateRole: "todo-item"
 	socialRole: "Note"
-	model: "Stream"
+	model: "stream"
 	containedBy: ["todo"]
 	label: "To Do Item"
 	description: "A single item in a to-do list"

@@ -2,7 +2,7 @@
 	templateId: "test-todo"
 	templateRole:"todo"
 	socialRole:"Page"
-	model:"Stream"
+	model:"stream"
 	containedBy:["top","folder"]
 	label:"To Do List"
 	description:"A simple demo of Custom Templates in Emissary"
