@@ -1,36 +1,74 @@
-{{- $builder := . -}}
 {{- $children := .Children.ByRank.Slice -}}
 
+<!-- This refreshes the page when we receive an event from the server -->
 <div class="page" hx-get="/{{.StreamID}}" hx-trigger="refreshPage from:window" hx-target="this" hx-swap="outerHTML" hx-push-url="false">
 
-	<div id="menu-bar">
-		<div class="left">
-			<a hx-get="/{{.StreamID}}/edit">Edit List</a>
-		</div>
-		<div class="right">
-			<a hx-get="/{{.StreamID}}/delete" class="text-red">Delete</a>
-		</div>
+	<h1 class="margin-top-none">{{.Label}}</h1>
+	<div class="text-gray">{{.Summary}}</div>
+
+	<form hx-post="/{{.StreamID}}/sort" hx-trigger="sort" hx-swap="none">
+		<table class="table margin-top-lg">
+			
+			<!-- Show the "add" button IF the user has the right permissions... -->
+			{{- if .UserCan "add" -}}
+				<tr hx-get="/{{.StreamID}}/add" role="button"><td colspan="4">
+					<span class="link">{{icon "add"}} Add Task</span>
+				</td></tr>
+			{{- end -}}
+
+			<!-- Sortable list of To-Do items. Clicking will open the "edit" modal. -->
+			<tbody id="sortable">
+				{{- range $children -}}
+					<tr role="button">
+						<input type="hidden" name="keys" value="{{.StreamID}}">
+						<td><span class="drag-handle">{{icon "drag-handle"}}</span></td>
+						<td hx-get="/{{.StreamID}}/view" nowrap>
+							{{- if .Data.GetBool "complete" -}}
+								{{icon "check-circle-fill"}}
+							{{- else -}}
+								{{icon "circle"}}
+							{{- end }}
+							{{.Label}}
+						</td>
+						<td hx-get="/{{.StreamID}}"><span class="text-gray text-sm">{{.Summary}}</span></td>
+						<td class="align-right"><button class="text-sm" hx-get="/{{.StreamID}}/discuss">Discussion</button></td>
+					</tr>
+				{{- end -}}
+			</tbody>
+		</table>
+	</form>
+
+	<!-- "Follow" and "Edit" buttons -->
+	<div class="text-sm pos-absolute" style="right:8px; top:8px;">
+		{{- if .IsAuthenticated -}}
+			<button class="primary" hx-get="/@me/inbox/following-add?url={{.Permalink}}">+ Follow</button>
+		{{- else -}}
+			<button class="primary" hx-get="/{{.StreamID}}/follow">+ Follow</button>
+		{{- end -}}
+
+		<button hx-get="/{{.StreamID}}/followers">Followers</button>
+
+		{{- if .UserCan "edit" -}}
+			<button hx-get="/{{.StreamID}}/edit">Edit List</button>
+		{{- end -}}
 	</div>
 
-	<h1 class="flex-grow-1">To Do List</h1>
+	<!-- Extra stuff for drag-and-drop sorting -->
+	<script src="/.themes/global/resources/sortable-1.15.0/Sortable.min.js"></script>
+	<script type="text/hyperscript">
+		init 
+			make a Sortable from #sortable
+		end
 
-	<table class="table">
-		<tr hx-get="/{{.StreamID}}/add" role="button"><td colspan="3">
-			<span class="link">{{icon "add"}} Add Task</span>
-		</td></tr>
-		{{- range $children -}}
-			<tr role="button">
-				<td hx-get="/{{.StreamID}}/view">
-					{{- if .Data.GetBool "complete" -}}
-						{{icon "check-circle-fill"}}
-					{{- else -}}
-						{{icon "circle"}}
-					{{- end }}
-				{{.Label}}</td>
-				<td hx-get="/{{.StreamID}}/view"><div class="text-gray text-sm ellipsis">{{.Summary}}</div></</td>
-				<td class="align-right"><button class="text-sm" hx-get="/{{.StreamID}}/discuss">Discussion</button></td>
-			</tr>
-		{{- end -}}
-	</table>
+		on refreshPage from window
+			log "Got a Refresh Page..."
+	</script>
+
+	<style>
+		.drag-handle{
+			cursor:grab;
+			padding-right:4px;
+		}
+	</style>
 
 </div>

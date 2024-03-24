@@ -1,7 +1,30 @@
+
 <div class="page" hx-get="/{{.StreamID}}" hx-trigger="refreshPage from:window" hx-push-url="false">
+
 	<link rel="alternate" type="application/activity+json" href="{{.Permalink}}">
-	<button class="float-right" hx-get="/{{.StreamID}}/edit">Edit</button>
 	<h1 class="margin-top-none">{{.Label}}</h1>
 	<div class="margin-bottom">{{.Summary}}</div>
-	<div>Follow <b>@{{.Token}}@{{.Hostname}}</b> to join this group and receive messages.</div>
+
+	<div class="table">
+		{{.View "view-outbox"}}
+	</div>
+
+	<!-- Menu Buttons in top-right corner -->
+	<div class="pos-absolute text-sm" style="right: 8px; top: 8px;">
+
+		<!-- Follow button behaves differently when authenticated -->
+		{{- if .IsAuthenticated -}}
+			<button hx-get="/@me/inbox/following-add?url={{.Permalink}}" class="primary">+ Follow</button>
+		{{- else -}}
+			<button hx-get="/{{.StreamID}}/follow">+ Follow</button>
+		{{- end -}}
+
+		<!-- View all Followers -->
+		<button hx-get="/{{.StreamID}}/followers">Followers</button>
+
+		<!-- Optional "edit" button dislayed IF the User has the right permissions -->
+		{{- if .UserCan "edit" -}}
+			<button class="float-right" hx-get="/{{.StreamID}}/edit">Edit</button>
+		{{- end -}}
+	</div>
 </div>

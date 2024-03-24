@@ -10,6 +10,7 @@
 	actor:{
 		social-role:Application
 		boost-children:true
+		allow-follower:["anonymous", "authenticated", "role"]
 	}
 	actions:{
 		create:{
@@ -17,6 +18,7 @@
 			steps:[
 				{do:"set-data", values:{label:"To Do List"}}
 				{do:"save"}
+				{do:"publish"}
 				{do:"forward-to", url:"/{{.StreamID}}"}
 			]
 		}
@@ -24,6 +26,7 @@
 		view:{do:"view-html"}
 		
 		edit:{
+			roles:["owner"]
 			steps:[
 				{
 					do:as-modal
@@ -35,16 +38,24 @@
 								type:layout-vertical
 								label:Edit To-Do List
 								children: [
+									{type:"text", path:"token",label:"Token"}
 									{type:"text", path:"label",label:"Name"}
+									{type:"textarea", path:"summary",label:"Summary"}
 								]
 							}
+							options: [
+								"delete:/{{.StreamID}}/delete"
+							]
 						}
+						{do:"publish"}
 					]
 				}
 			]
 		}
 		delete:{
+			roles:["owner"]
 			steps:[
+				{do:"unpublish"}
 				{do:"delete"}
 				{do:"forward-to", url:"/{{.ParentID}}"}
 			]
@@ -56,6 +67,31 @@
 				{do:"add-stream", style:"inline", template:"test-todo-item", location:"child"}
 				{do:"trigger-event", event:"closeModal"}
 				{do:"trigger-event", event:"refreshPage"}
+			]
+		}
+
+		# displays a "follow" dialog for non-authenticated users
+		follow: {
+			steps:[
+				{do:"as-modal", steps:[
+					{do:"view-html"}
+				]}
+			]
+		}
+
+		# displays a list of followers
+		followers: {
+			steps:[
+				{do:"as-modal", steps:[
+					{do:"view-html"}
+				]}
+			]
+		}
+
+		# sorts to-do items
+		sort: {
+			steps:[
+				{do:"sort"}
 			]
 		}
 	}

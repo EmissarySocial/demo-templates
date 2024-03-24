@@ -4,34 +4,8 @@
 	model: stream
 	containedBy: ["top", "folder"]
 	label: Group
-	description: Folders can contain all other streams
+	description: Groups relay messages to all of their followers
 	icon: users
-	childSortType: label
-	childSortOrder: ASC
-	schema: {
-		type: object
-		properties: {
-			token: {type:"string"}
-			label: {type:"string"}
-			summary: {type:"string"}
-		}
-	}
-	states: {
-		default: {
-			label: Default
-			description: Folders only have one state
-		}
-	}
-	roles: {
-		editor: {
-			label: Editor
-			description: Editors can manage all content in this folder
-		}
-		viewer: {
-			label: Viewer
-			description: Viewers can access folder contents, but can not add new items
-		}
-	}
 	actor: {
 		social-role: Application
 		rss: true
@@ -42,28 +16,25 @@
 	}
 	actions: {
 		create: {
-			roles:["editor","owner"]
+			roles:["owner"]
 			steps:[
-				{
-					do:"set-data", 
-					values:{
-						label:"New Group"
-					}
-				}
+				{do:"set-data", values:{label:"New Group"}}
 				{do:"save"}
+				{do:"publish"}
 				{do:"forward-to", url:"/{{.StreamID}}"}
 			]
 		}
 		view: {
-			roles: ["viewer","editor","owner"]
+			do:"view-html"
+		}
+		view-outbox: {
 			do:"view-html"
 		}
 		edit: {
-			roles: ["editor"]
+			roles: ["owner"]
 			steps:[
 				{
 					do:"as-modal"
-					background:"view"
 					steps: [
 						{
 							do:"edit"
@@ -76,23 +47,29 @@
 									{type:"textarea", label:"Summary", path:"summary"}
 								]
 							}
+							options: [
+								"delete:/{{.StreamID}}/delete"
+							]
 						}, 
 						{do:"save", comment:"Updated Folder"}
+						{do: "publish"}
+
 					]
 				}
 				{do:"refresh-page"}
 			]
 		}
 		delete: {
-			roles: ["editor"]
+			roles: ["owner"]
 			steps: [
+				{do: "unpublish"}
 				{do:"delete", title:"Delete this Folder?", message:"This will permanently delete this folder and all of its contents"}
 				{do:"forward-to", url:"/{{.ParentID}}"}
 			]
 		}
 
 		sharing: {
-			roles: ["editor"]
+			roles: ["owner"]
 			steps: [
 				{do:"as-modal", steps: [
 					{do:"set-simple-sharing", roles: ["viewer"], title:"Sharing Settings", message:"Select Which People Can See This Folder"}
@@ -100,7 +77,21 @@
 				]}
 			]
 		}
-		feed: {roles: ["viewer"], do:"view-feed"}
-		websub: {roles: ["viewer"], do:"websub"}
+
+		follow: {
+			steps: [
+				{do:"as-modal", steps:[
+					{do:"view-html"}
+				]}
+			]
+		}
+
+		followers: {
+			steps: [
+				{do:"as-modal", steps:[
+					{do:"view-html"}
+				]}
+			]
+		}
 	}
 }

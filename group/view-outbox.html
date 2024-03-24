@@ -1,0 +1,23 @@
+{{- $outbox := .Outbox.Top30.ByCreateDate.Reverse.Slice -}}
+{{- $builder := . -}}
+
+{{- range $index, $message := $outbox -}}
+	{{- $stream := $builder.ActivityStream $message.URL -}}
+	{{- $attributedTo := $stream.AttributedTo -}}
+	{{- $icon := $attributedTo.Icon -}}
+	<div class="flex-row">
+
+		{{- if $icon.NotNil -}}
+			<img src="{{$icon.Href}}" class="circle-32">
+		{{- else -}}
+			<div class="circle-32"></div>
+		{{- end -}}
+		<div>
+			<div class="bold">{{$attributedTo.Name}}</div>
+			<div>{{$stream.Name}}</div>
+			<div>{{$stream.Summary}}</div>
+			<div>{{$stream.Content | html}}</div>
+			<div class="text-gray">{{$stream.Published | longDate}}</div>
+		</div>
+	</div>
+{{- end -}}

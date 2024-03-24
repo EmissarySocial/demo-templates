@@ -1,0 +1,11 @@
+{{- $followers := .Followers -}}
+
+{{- if eq (len $followers) 0 -}}
+  {{- "No followers" -}}
+{{- else -}}
+  {{- range $followers -}}	
+	{{- .User.Username -}}
+  {{- end -}}
+{{- end -}}
+
+<pre>{{$followers | json}}</pre>
