@@ -18,7 +18,7 @@
 			steps:[
 				{do:"set-data", values:{label:"To Do List"}}
 				{do:"save"}
-				{do:"publish"}
+				{do:"publish", outbox:true}
 				{do:"forward-to", url:"/{{.StreamID}}"}
 			]
 		}
@@ -47,7 +47,7 @@
 								"delete:/{{.StreamID}}/delete"
 							]
 						}
-						{do:"publish"}
+						{do:"publish", outbox:true}
 					]
 				}
 			]
@@ -55,7 +55,7 @@
 		delete:{
 			roles:["owner"]
 			steps:[
-				{do:"unpublish"}
+				{do:"unpublish", outbox:true}
 				{do:"delete"}
 				{do:"forward-to", url:"/{{.ParentID}}"}
 			]

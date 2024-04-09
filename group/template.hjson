@@ -20,7 +20,7 @@
 			steps:[
 				{do:"set-data", values:{label:"New Group"}}
 				{do:"save"}
-				{do:"publish"}
+				{do:"publish", outbox:true}
 				{do:"forward-to", url:"/{{.StreamID}}"}
 			]
 		}
@@ -52,7 +52,7 @@
 							]
 						}, 
 						{do:"save", comment:"Updated Folder"}
-						{do: "publish"}
+						{do:"publish", outbox:true}
 
 					]
 				}
@@ -62,7 +62,7 @@
 		delete: {
 			roles: ["owner"]
 			steps: [
-				{do: "unpublish"}
+				{do: "unpublish", outbox:true}
 				{do:"delete", title:"Delete this Folder?", message:"This will permanently delete this folder and all of its contents"}
 				{do:"forward-to", url:"/{{.ParentID}}"}
 			]

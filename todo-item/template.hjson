@@ -31,7 +31,7 @@
 							{type:"text", label:"Due Date", path:"data.dueDate"}
 						]
 					}}
-					{do:"publish"}
+					{do:"publish", outbox:true}
 					{do:"trigger-event", "event":"refreshPage"}
 				]}
 			]
@@ -58,14 +58,14 @@
 						}
 						options: ["delete: /{{.StreamID}}/delete"]
 					}
-					{do:"publish"}
+					{do:"publish", outbox:true}
 					{do:"trigger-event", "event":"refreshPage"}
 				]}
 			]
 		}
 		delete: {
 			"steps": [
-				{do:"unpublish"}
+				{do:"unpublish", outbox:true}
 				{do:"delete", "title":"Delete Task?"}
 				{do:"trigger-event", "event":"refreshPage"}
 			]
