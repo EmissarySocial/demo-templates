@@ -10,10 +10,10 @@
 		{{- range $followers -}}
 			{{- $actor := .Actor -}}
 			<div class="flex-row" script="on click go to url '{{$actor.ProfileURL}}'">
-				{{- if eq "" $actor.ImageURL -}}
+				{{- if eq "" $actor.IconURL -}}
 					<div class="circle-32"></div>
 				{{- else -}}
-					<img src="{{$actor.ImageURL}}" class="circle-32">
+					<img src="{{$actor.IconURL}}" class="circle-32">
 				{{- end -}}
 
 				<div>
